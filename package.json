@@ -1,0 +1,9 @@
+{
+  "name": "swybuy",
+  "private": true,
+  "scripts": {
+    "dev:api": "npm --prefix api run start:dev",
+    "dev:web": "npm --prefix web run dev",
+    "db:setup": "npm --prefix api run db:generate && npm --prefix api run db:push && npm --prefix api run db:seed"
+  }
+}

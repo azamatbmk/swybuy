@@ -1,0 +1,66 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: #f7f3f0;
+  --foreground: #2b2430;
+}
+
+html {
+  text-rendering: optimizeLegibility;
+  font-synthesis: none;
+}
+
+body {
+  color: var(--foreground);
+  font-weight: 500;
+  letter-spacing: -0.01em;
+  font-feature-settings: "kern" 1, "liga" 1;
+  background:
+    radial-gradient(1200px 500px at 10% -10%, rgba(226, 217, 247, 0.55), transparent 55%),
+    radial-gradient(900px 400px at 100% 0%, rgba(255, 255, 255, 0.7), transparent 45%),
+    var(--background);
+}
+
+h1,
+h2,
+h3 {
+  font-family: var(--font-display), "Palatino Linotype", sans-serif;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  line-height: 1.18;
+  -webkit-text-stroke: 0.5px currentColor;
+  paint-order: stroke fill;
+}
+
+.font-display {
+  -webkit-text-stroke: 0.45px currentColor;
+  paint-order: stroke fill;
+}
+
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-full px-6 py-3 text-sm font-semibold tracking-[0.02em] transition duration-200 disabled:opacity-60;
+  }
+
+  .btn-primary {
+    @apply bg-lavender-full text-white hover:bg-lavender-deep hover:shadow-soft;
+  }
+
+  .btn-ghost {
+    @apply border border-ink/10 bg-white text-ink hover:border-lavender-full hover:text-lavender-deep;
+  }
+
+  .field {
+    @apply w-full rounded-2xl border border-ink/10 bg-white/80 px-3 py-2.5 outline-none transition placeholder:text-ink/35 focus:border-lavender-full focus:bg-white;
+  }
+
+  .card {
+    @apply rounded-3xl bg-white shadow-card;
+  }
+
+  .eyebrow {
+    @apply font-sans text-[11px] font-medium uppercase tracking-[0.28em] text-lavender-deep;
+  }
+}

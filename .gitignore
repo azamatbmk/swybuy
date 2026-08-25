@@ -1,0 +1,11 @@
+node_modules
+.next
+dist
+.env
+.env.local
+*.db
+*.db-journal
+coverage
+.DS_Store
+api/scripts/tmp-html
+api/scripts/tmp-html/**
