@@ -58,7 +58,18 @@ export function ProductsBoard({
   return (
     <section>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-2xl font-medium">Товары</h2>
+        <div>
+          <h2 className="text-2xl font-medium">Товары</h2>
+          <p className="mt-1 text-sm text-ink/55">
+            Остатки × цена, все карточки:{' '}
+            {formatPrice(
+              products.reduce(
+                (sum, item) => sum + item.price * item.stock,
+                0,
+              ),
+            )}
+          </p>
+        </div>
         <button
           onClick={() => {
             setFormError('');

@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import { Author, Order, Product } from '@/lib/types';
+import { Author, Order, Product, formatPrice } from '@/lib/types';
 import { AuthorsBoard } from './AuthorsBoard';
 import { OrdersBoard } from './OrdersBoard';
 import { ProductsBoard } from './ProductsBoard';
@@ -120,7 +120,13 @@ export default function AdminPage() {
           <h1 className="text-3xl font-medium">Админка</h1>
           <p className="mt-1 text-sm text-ink/60">
             {orders.length} заказов · {authors.length} витрин ·{' '}
-            {products.filter((item) => item.active).length} на складе
+            {products.filter((item) => item.active).length} в витрине · склад{' '}
+            {formatPrice(
+              products.reduce(
+                (sum, item) => sum + item.price * item.stock,
+                0,
+              ),
+            )}
           </p>
         </div>
         <div className="flex gap-2">

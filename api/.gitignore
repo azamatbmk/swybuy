@@ -1,6 +1,12 @@
 node_modules
 dist
-.env
-prisma/dev.db
-prisma/dev.db-journal
 coverage
+
+.env
+.env.*
+!.env.example
+
+prisma/*.db
+prisma/*.db-journal
+prisma/*.db-wal
+prisma/*.db-shm

@@ -24,6 +24,13 @@ export const metadata: Metadata = {
   description:
     'See what you buy. Уход со склада, по Северной Осетии доставка в день покупки бесплатно.',
   referrer: 'strict-origin-when-cross-origin',
+  icons: {
+    icon: [
+      { url: '/icon.svg', type: 'image/svg+xml' },
+      { url: '/favicon.png', type: 'image/png' },
+    ],
+    apple: '/apple-icon.png',
+  },
 };
 
 export const viewport: Viewport = {
