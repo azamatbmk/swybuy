@@ -9,10 +9,18 @@ export function RoutineCards({
   products: Product[];
   refSlug?: string;
 }) {
+  const routines = ROUTINES.map((routine) => {
+    const items = productsBySkus(products, routine.skus);
+    return { routine, items };
+  }).filter(({ items }) => items.length > 0);
+
+  if (routines.length === 0) {
+    return null;
+  }
+
   return (
     <div className="grid gap-4 md:grid-cols-3">
-      {ROUTINES.map((routine) => {
-        const items = productsBySkus(products, routine.skus);
+      {routines.map(({ routine, items }) => {
         const total = items.reduce((sum, item) => sum + item.price, 0);
         const first = items[0];
         const href = first

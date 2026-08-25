@@ -52,7 +52,9 @@ export function Catalog({
       <p className="mt-3 text-sm text-ink/45">
         {query.trim()
           ? `${visible.length} из ${products.length}`
-          : `${products.length} средств на складе`}
+          : refSlug
+            ? `${products.length} средств в подборке`
+            : `${products.length} средств на складе`}
       </p>
       {visible.length === 0 ? (
         <p className="card mt-6 px-6 py-10 text-ink/55">

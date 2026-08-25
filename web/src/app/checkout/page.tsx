@@ -47,12 +47,19 @@ export default function CheckoutPage() {
 
     const form = new FormData(event.currentTarget);
 
+    const phone = String(form.get('phone') || '').trim();
+    if (phone.replace(/\D/g, '').length < 10) {
+      setError('Укажите телефон, например +7 928 123-45-67');
+      setLoading(false);
+      return;
+    }
+
     try {
       const order = await api.createOrder({
         items: items.map((item) => ({ sku: item.sku, quantity: item.quantity })),
         ref: readRefFromDocument() || undefined,
         customerName: String(form.get('customerName')),
-        phone: String(form.get('phone')),
+        phone,
         email: String(form.get('email') || '').trim() || undefined,
         city: String(form.get('city') || '').trim() || undefined,
         street: String(form.get('street') || '').trim() || undefined,
@@ -97,7 +104,9 @@ export default function CheckoutPage() {
             name="phone"
             type="tel"
             required
+            inputMode="tel"
             autoComplete="tel"
+            placeholder="+7 928 123-45-67"
             className="field mt-1"
           />
         </label>
@@ -153,8 +162,8 @@ export default function CheckoutPage() {
             <input
               type="radio"
               name="paymentMethod"
-              checked
-              readOnly
+              value="cash"
+              defaultChecked
               className="mt-1"
             />
             <span>

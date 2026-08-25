@@ -2,16 +2,18 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import { Order, Product } from '@/lib/types';
+import { Author, Order, Product } from '@/lib/types';
+import { AuthorsBoard } from './AuthorsBoard';
 import { OrdersBoard } from './OrdersBoard';
 import { ProductsBoard } from './ProductsBoard';
 
 export default function AdminPage() {
   const [ready, setReady] = useState(false);
   const [authed, setAuthed] = useState(false);
-  const [tab, setTab] = useState<'orders' | 'products'>('orders');
+  const [tab, setTab] = useState<'orders' | 'products' | 'authors'>('orders');
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [authors, setAuthors] = useState<Author[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
@@ -20,17 +22,20 @@ export default function AdminPage() {
     setLoading(true);
     try {
       await api.adminPing();
-      const [nextOrders, nextProducts] = await Promise.all([
+      const [nextOrders, nextProducts, nextAuthors] = await Promise.all([
         api.adminOrders(),
         api.adminProducts(),
+        api.adminAuthors(),
       ]);
       setOrders(nextOrders);
       setProducts(nextProducts);
+      setAuthors(nextAuthors);
       setAuthed(true);
     } catch {
       setAuthed(false);
       setOrders([]);
       setProducts([]);
+      setAuthors([]);
     } finally {
       setLoading(false);
       setReady(true);
@@ -42,12 +47,14 @@ export default function AdminPage() {
     setLoading(true);
     try {
       await api.adminLogin(nextKey);
-      const [nextOrders, nextProducts] = await Promise.all([
+      const [nextOrders, nextProducts, nextAuthors] = await Promise.all([
         api.adminOrders(),
         api.adminProducts(),
+        api.adminAuthors(),
       ]);
       setOrders(nextOrders);
       setProducts(nextProducts);
+      setAuthors(nextAuthors);
       setAuthed(true);
     } catch (err) {
       setAuthed(false);
@@ -73,10 +80,11 @@ export default function AdminPage() {
     setAuthed(false);
     setOrders([]);
     setProducts([]);
+    setAuthors([]);
   }
 
   if (!ready) {
-    return null;
+    return <p className="text-ink/50">Открываем админку…</p>;
   }
 
   if (!authed) {
@@ -85,11 +93,7 @@ export default function AdminPage() {
         onSubmit={onLogin}
         className="card mx-auto max-w-md space-y-4 p-5 md:p-8"
       >
-        <h1 className="text-4xl font-semibold">Админка</h1>
-        <p className="text-sm text-ink/60">
-          Ключ из <code>api/.env</code>, поле <code>ADMIN_KEY</code>. Не короче 8
-          символов.
-        </p>
+        <h1 className="text-4xl font-medium">Админка</h1>
         <input
           name="key"
           type="password"
@@ -113,10 +117,10 @@ export default function AdminPage() {
     <div className="space-y-8">
       <div className="flex flex-wrap items-center justify-between gap-3">
         <div>
-          <h1 className="text-3xl font-semibold">Админка</h1>
+          <h1 className="text-3xl font-medium">Админка</h1>
           <p className="mt-1 text-sm text-ink/60">
-            {orders.length} заказов · {products.filter((item) => item.active).length}{' '}
-            на витрине
+            {orders.length} заказов · {authors.length} витрин ·{' '}
+            {products.filter((item) => item.active).length} на складе
           </p>
         </div>
         <div className="flex gap-2">
@@ -135,7 +139,7 @@ export default function AdminPage() {
         </div>
       </div>
 
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2">
         <button
           onClick={() => setTab('orders')}
           className={`rounded-full px-4 py-2 text-sm ${
@@ -152,12 +156,26 @@ export default function AdminPage() {
         >
           Товары
         </button>
+        <button
+          onClick={() => setTab('authors')}
+          className={`rounded-full px-4 py-2 text-sm ${
+            tab === 'authors' ? 'bg-lavender-full text-white' : 'bg-white'
+          }`}
+        >
+          Блогеры
+        </button>
       </div>
 
       {tab === 'orders' ? (
         <OrdersBoard orders={orders} setOrders={setOrders} />
-      ) : (
+      ) : tab === 'products' ? (
         <ProductsBoard products={products} setProducts={setProducts} />
+      ) : (
+        <AuthorsBoard
+          authors={authors}
+          products={products}
+          setAuthors={setAuthors}
+        />
       )}
     </div>
   );

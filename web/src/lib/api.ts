@@ -7,6 +7,16 @@ function apiBase() {
   return '/backend';
 }
 
+function friendlyMessage(raw: string) {
+  if (/phone/i.test(raw) && /must match|regular expression/i.test(raw)) {
+    return 'Укажите телефон, например +7 928 123-45-67';
+  }
+  if (/must match|regular expression/i.test(raw)) {
+    return 'Проверьте поле';
+  }
+  return raw;
+}
+
 async function request<T>(path: string, init?: RequestInit): Promise<T> {
   let response: Response;
   try {
@@ -30,9 +40,9 @@ async function request<T>(path: string, init?: RequestInit): Promise<T> {
     try {
       const payload = (await response.json()) as { message?: string | string[] };
       if (Array.isArray(payload.message)) {
-        message = payload.message.join(', ');
+        message = payload.message.map(friendlyMessage).join(', ');
       } else if (payload.message) {
-        message = payload.message;
+        message = friendlyMessage(payload.message);
       }
     } catch {
       message = response.statusText;
@@ -47,6 +57,7 @@ export const api = {
   products: () => request<Product[]>('/products'),
   product: (slug: string) => request<Product>(`/products/${slug}`),
   author: (slug: string) => request<Author>(`/authors/${slug}`),
+  authors: () => request<Pick<Author, 'slug' | 'name' | 'handle'>[]>('/authors'),
   order: (id: string, token: string) =>
     request<Order>(`/orders/${id}`, {
       headers: { 'x-order-token': token },
@@ -93,6 +104,17 @@ export const api = {
   adminPing: () => request<{ ok: boolean }>('/admin/ping'),
   adminOrders: () => request<Order[]>('/admin/orders'),
   adminProducts: () => request<Product[]>('/admin/products'),
+  adminAuthors: () => request<Author[]>('/admin/authors'),
+  createAuthor: (body: { handle: string; skus: string[] }) =>
+    request<Author>('/admin/authors', {
+      method: 'POST',
+      body: JSON.stringify(body),
+    }),
+  updateAuthor: (id: string, body: { handle: string; skus: string[] }) =>
+    request<Author>(`/admin/authors/${id}`, {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
   updateOrder: (id: string, body: { status?: string; trackNumber?: string }) =>
     request<Order>(`/admin/orders/${id}`, {
       method: 'PATCH',

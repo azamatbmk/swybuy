@@ -56,9 +56,11 @@ export class CreateOrderDto {
   customerName: string;
 
   @Transform(emptyToUndefined)
-  @IsString()
-  @MaxLength(20)
-  @Matches(/^\+?[0-9()\-\s]{10,20}$/)
+  @IsString({ message: 'Укажите телефон' })
+  @MaxLength(32, { message: 'Укажите телефон, например +7 928 123-45-67' })
+  @Matches(/^\+?[0-9()\-\s]+$/, {
+    message: 'Укажите телефон, например +7 928 123-45-67',
+  })
   phone: string;
 
   @IsOptional()

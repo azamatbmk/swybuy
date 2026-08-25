@@ -21,6 +21,8 @@ import {
 } from '../products/dto/save-product.dto';
 import { UpdateOrderDto } from './dto/update-order.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
+import { AuthorsService } from '../authors/authors.service';
+import { SaveAuthorDto } from '../authors/dto/save-author.dto';
 import { clientIp, rateLimit } from '../lib/rate-limit';
 
 function isSecureRequest(request: {
@@ -43,6 +45,7 @@ export class AdminController {
   constructor(
     private readonly ordersService: OrdersService,
     private readonly productsService: ProductsService,
+    private readonly authorsService: AuthorsService,
     private readonly sessions: AdminSessionsService,
   ) {}
 
@@ -128,5 +131,23 @@ export class AdminController {
   @UseGuards(AdminGuard)
   updateProduct(@Param('id') id: string, @Body() body: UpdateProductDto) {
     return this.productsService.updateAdmin(id, body);
+  }
+
+  @Get('authors')
+  @UseGuards(AdminGuard)
+  authors() {
+    return this.authorsService.findAllAdmin();
+  }
+
+  @Post('authors')
+  @UseGuards(AdminGuard)
+  createAuthor(@Body() body: SaveAuthorDto) {
+    return this.authorsService.createAdmin(body);
+  }
+
+  @Patch('authors/:id')
+  @UseGuards(AdminGuard)
+  updateAuthor(@Param('id') id: string, @Body() body: SaveAuthorDto) {
+    return this.authorsService.updateAdmin(id, body);
   }
 }

@@ -23,16 +23,16 @@ const products = JSON.parse(
 ) as SeedProduct[];
 
 const authors = [
-  { slug: 'masha', name: 'Маша' },
-  { slug: 'anna', name: 'Анна' },
-  { slug: 'lina', name: 'Лина' },
+  { slug: 'masha', name: 'Маша', handle: 'masha' },
+  { slug: 'anna', name: 'Анна', handle: 'anna' },
+  { slug: 'lina', name: 'Лина', handle: 'lina' },
 ];
 
 async function main() {
   for (const author of authors) {
     await prisma.author.upsert({
       where: { slug: author.slug },
-      update: { name: author.name },
+      update: { name: author.name, handle: author.handle },
       create: author,
     });
   }

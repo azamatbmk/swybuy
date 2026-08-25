@@ -81,8 +81,8 @@ export function PublishShelf({
       <p className="eyebrow">Полка</p>
       <h2 className="mt-2 text-2xl font-medium">Показать, что берёте</h2>
       <p className="mt-2 text-sm text-ink/55">
-        На публичной странице будут только отмеченные средства. Цена заказа,
-        адрес и трек туда не попадут.
+        Не обязательно. Если хотите — отметьте средства, и появится публичная
+        страница. Цена заказа, телефон и адрес туда не попадут.
       </p>
 
       <label className="mt-4 block text-sm">

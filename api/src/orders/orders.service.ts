@@ -46,7 +46,9 @@ export class OrdersService {
       throw new BadRequestException('Доставляем только по Северной Осетии');
     }
     if (dto.phone.replace(/\D/g, '').length < 10) {
-      throw new BadRequestException('Нужен телефон');
+      throw new BadRequestException(
+        'Укажите телефон, например +7 928 123-45-67',
+      );
     }
 
     const merged = new Map<string, number>();

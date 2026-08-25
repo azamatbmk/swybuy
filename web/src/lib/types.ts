@@ -38,9 +38,12 @@ export type ShelfPublish = {
 };
 
 export type Author = {
-  id: string;
+  id?: string;
   slug: string;
   name: string;
+  handle?: string;
+  products?: Product[];
+  skus?: string[];
 };
 
 export type OrderItem = {

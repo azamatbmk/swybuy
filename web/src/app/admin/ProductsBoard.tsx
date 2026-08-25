@@ -58,7 +58,7 @@ export function ProductsBoard({
   return (
     <section>
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-2xl font-semibold">Товары</h2>
+        <h2 className="text-2xl font-medium">Товары</h2>
         <button
           onClick={() => {
             setFormError('');

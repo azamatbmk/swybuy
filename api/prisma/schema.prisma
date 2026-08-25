@@ -26,10 +26,22 @@ model Product {
 }
 
 model Author {
-  id     String  @id @default(cuid())
-  slug   String  @unique
+  id     String              @id @default(cuid())
+  slug   String              @unique
   name   String
+  handle String              @default("")
+  items  AuthorCatalogItem[]
   orders Order[]
+}
+
+model AuthorCatalogItem {
+  id        String   @id @default(cuid())
+  author    Author   @relation(fields: [authorId], references: [id], onDelete: Cascade)
+  authorId  String
+  sku       String
+  createdAt DateTime @default(now())
+
+  @@unique([authorId, sku])
 }
 
 model User {
@@ -68,7 +80,7 @@ model Order {
   house           String
   apartment       String?
   deliveryType    String    @default("pochta")
-  paymentMethod   String    @default("card")
+  paymentMethod   String    @default("cash")
   accessToken     String?   @unique
   stockReserved   Boolean   @default(false)
   deliveryPrice   Int
