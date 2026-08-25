@@ -7,10 +7,11 @@ import {
 import { randomBytes } from 'crypto';
 import { PrismaService } from '../prisma/prisma.service';
 import { slugify } from '../lib/slugify';
+import { safeEqual } from '../lib/safe-equal';
 import { OrderItemSnapshot } from '../orders/orders.service';
 import { PublishShelfDto, UpdateShelfDto } from './dto/publish-shelf.dto';
 
-const PAID = new Set(['paid', 'packed', 'shipped']);
+const PAID = new Set(['confirmed', 'paid', 'packed', 'shipped']);
 
 @Injectable()
 export class ShelvesService {
@@ -51,7 +52,13 @@ export class ShelvesService {
       where: { id: orderId },
       include: { user: true },
     });
-    if (!order) {
+    const dummy = '0'.repeat(48);
+    const expected = order?.accessToken || dummy;
+    const provided = dto.orderToken || dummy;
+    const owns =
+      Boolean(order?.accessToken && dto.orderToken) &&
+      safeEqual(provided, expected);
+    if (!owns || !order) {
       throw new NotFoundException('Заказ не найден');
     }
     if (!PAID.has(order.status)) {
@@ -71,8 +78,10 @@ export class ShelvesService {
     const name = dto.name.trim();
     let user = order.user;
 
-    if (user && dto.token && dto.token !== user.manageToken) {
-      throw new ForbiddenException('Нет доступа к этой полке');
+    if (user) {
+      if (!dto.token || !safeEqual(dto.token, user.manageToken)) {
+        throw new ForbiddenException('Нет доступа к этой полке');
+      }
     }
 
     if (!user && dto.token) {
@@ -130,7 +139,7 @@ export class ShelvesService {
     if (!user) {
       throw new NotFoundException('Полка не найдена');
     }
-    if (dto.token !== user.manageToken) {
+    if (!safeEqual(dto.token, user.manageToken)) {
       throw new ForbiddenException('Нет доступа к этой полке');
     }
 

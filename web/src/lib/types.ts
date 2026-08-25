@@ -63,6 +63,7 @@ export type Order = {
   house: string;
   apartment: string | null;
   deliveryType: string;
+  paymentMethod?: string;
   deliveryPrice: number;
   itemsTotal: number;
   total: number;
@@ -73,12 +74,14 @@ export type Order = {
   author: Author | null;
   shelf?: { slug: string; name: string } | null;
   paymentUrl?: string;
+  accessToken?: string;
   createdAt?: string;
   paidAt?: string | null;
 };
 
 export const ORDER_STATUSES = [
   'pending',
+  'confirmed',
   'paid',
   'packed',
   'shipped',
@@ -88,12 +91,21 @@ export const ORDER_STATUSES = [
 
 export const ORDER_STATUS_LABEL: Record<string, string> = {
   pending: 'Ожидает оплату',
+  confirmed: 'Наличными при получении',
   paid: 'Оплачен',
   packed: 'Собран',
   shipped: 'Отправлен',
   returned: 'Возврат',
   failed: 'Ошибка',
 };
+
+export function paymentMethodLabel(method?: string) {
+  return method === 'cash' ? 'Наличными при получении' : 'Картой онлайн';
+}
+
+export function deliveryTypeLabel(_type?: string) {
+  return 'Почта России';
+}
 
 export function formatPrice(value: number) {
   return `${value.toLocaleString('ru-RU')} ₽`;

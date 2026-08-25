@@ -1,23 +1,21 @@
 import Link from 'next/link';
-import { formatPrice } from '@/lib/types';
-import { FREE_DELIVERY_FROM } from '@/lib/shop';
 import { Logo } from './Logo';
 
 export function Footer() {
   return (
-    <footer className="mt-20 border-t border-ink/5">
+    <footer className="mt-12 border-t border-ink/5 pb-[env(safe-area-inset-bottom)] md:mt-20">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 md:grid-cols-3">
         <div>
           <Logo />
           <p className="mt-4 max-w-xs text-sm leading-relaxed text-ink/55">
             Уход со склада. То, что показывают в обзорах, можно заказать сразу —
-            отправка за 1–2 дня.
+            по Северной Осетии доставка в день покупки бесплатно.
           </p>
         </div>
         <div className="text-sm text-ink/65">
           <div className="eyebrow">Доставка</div>
-          <p className="mt-3">СДЭК по России, 350 ₽</p>
-          <p>Бесплатно от {formatPrice(FREE_DELIVERY_FROM)}</p>
+          <p className="mt-3">По Северной Осетии — в день покупки, бесплатно</p>
+          <p>Только по республике</p>
         </div>
         <div className="text-sm text-ink/65">
           <div className="eyebrow">Авторы</div>

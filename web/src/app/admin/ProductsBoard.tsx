@@ -6,11 +6,9 @@ import { Product, formatPrice } from '@/lib/types';
 import { ProductDraft, ProductForm } from './ProductForm';
 
 export function ProductsBoard({
-  adminKey,
   products,
   setProducts,
 }: {
-  adminKey: string;
   products: Product[];
   setProducts: (update: (current: Product[]) => Product[]) => void;
 }) {
@@ -25,7 +23,7 @@ export function ProductsBoard({
   ) {
     setError('');
     try {
-      const updated = await api.updateProduct(adminKey, id, body);
+      const updated = await api.updateProduct(id, body);
       setProducts((current) =>
         current.map((row) => (row.id === id ? updated : row)),
       );
@@ -39,12 +37,12 @@ export function ProductsBoard({
     setSaving(true);
     try {
       if (editor === 'new') {
-        const created = await api.createProduct(adminKey, draft);
+        const created = await api.createProduct(draft);
         setProducts((current) =>
           [...current, created].sort((a, b) => a.name.localeCompare(b.name, 'ru')),
         );
       } else if (editor) {
-        const updated = await api.updateProduct(adminKey, editor.id, draft);
+        const updated = await api.updateProduct(editor.id, draft);
         setProducts((current) =>
           current.map((row) => (row.id === editor.id ? updated : row)),
         );

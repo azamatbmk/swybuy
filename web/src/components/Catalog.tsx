@@ -59,7 +59,7 @@ export function Catalog({
           Ничего не нашлось. Попробуйте «пдрн», «крем» или тип кожи.
         </p>
       ) : (
-        <div className="mt-6 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+        <div className="mt-6 grid grid-cols-2 items-stretch gap-3 md:grid-cols-3 md:gap-6">
           {visible.map((product) => (
             <ProductCard key={product.id} product={product} refSlug={refSlug} />
           ))}

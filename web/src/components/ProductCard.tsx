@@ -13,7 +13,7 @@ export function ProductCard({
   const href = refSlug ? `/p/${product.slug}?ref=${refSlug}` : `/p/${product.slug}`;
 
   return (
-    <article className="card overflow-hidden">
+    <article className="card flex h-full flex-col overflow-hidden">
       <Link href={href} className="group block">
         <div className="aspect-[4/5] overflow-hidden bg-cream">
           <ProductImage
@@ -22,13 +22,13 @@ export function ProductCard({
             className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
           />
         </div>
-        <div className="px-4 pt-4 text-[15px] font-medium leading-snug tracking-[-0.02em] text-ink/80">
-          {product.name}
+        <div className="px-3 pt-3 text-[13px] font-medium leading-snug tracking-[-0.02em] text-ink/80 md:px-4 md:pt-4 md:text-[15px]">
+          <span className="line-clamp-2 min-h-[2.4em]">{product.name}</span>
         </div>
       </Link>
-      <div className="flex items-end justify-between gap-3 p-4 pt-2">
+      <div className="mt-auto flex flex-col gap-2 p-3 pt-2 md:flex-row md:items-end md:justify-between md:gap-3 md:p-4 md:pt-2">
         <div>
-          <div className="font-display text-2xl tracking-[0.04em]">
+          <div className="font-display text-xl tracking-[0.04em] md:text-2xl">
             {formatPrice(product.price)}
           </div>
           <div className="mt-1 text-xs text-ink/45">

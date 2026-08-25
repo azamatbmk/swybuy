@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { readShelfToken, saveShelfToken } from '@/lib/shelf-token';
+import { readShelfToken } from '@/lib/shelf-token';
 import { Product } from '@/lib/types';
 
 export function ManageShelf({
@@ -14,7 +14,6 @@ export function ManageShelf({
   products: Product[];
 }) {
   const router = useRouter();
-  const searchParams = useSearchParams();
   const [token, setToken] = useState('');
   const [selected, setSelected] = useState(products.map((item) => item.sku));
   const [saving, setSaving] = useState(false);
@@ -22,15 +21,9 @@ export function ManageShelf({
   const [ok, setOk] = useState(false);
 
   useEffect(() => {
-    const fromQuery = searchParams.get('edit') || '';
-    const saved = readShelfToken(slug);
-    const next = fromQuery || saved;
-    if (fromQuery) {
-      saveShelfToken(slug, fromQuery);
-    }
-    setToken(next);
+    setToken(readShelfToken(slug));
     setSelected(products.map((item) => item.sku));
-  }, [products, searchParams, slug]);
+  }, [products, slug]);
 
   if (!token) {
     return null;

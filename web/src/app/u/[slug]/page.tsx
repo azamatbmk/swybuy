@@ -18,7 +18,7 @@ export default async function ShelfPage({
       <div className="space-y-10">
         <section className="max-w-xl">
           <p className="eyebrow">Полка</p>
-          <h1 className="mt-3 text-4xl font-medium md:text-6xl">
+          <h1 className="mt-3 text-[2rem] font-medium leading-tight text-balance md:text-6xl">
             {shelf.name} показывает, что берёт
           </h1>
           <p className="mt-4 text-ink/60">
@@ -33,7 +33,7 @@ export default async function ShelfPage({
         {shelf.products.length === 0 ? (
           <p className="text-ink/55">Пока ничего не выложено.</p>
         ) : (
-          <div className="grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+          <div className="grid grid-cols-2 items-stretch gap-3 md:grid-cols-3 md:gap-6">
             {shelf.products.map((product) => (
               <ProductCard key={product.id} product={product} />
             ))}

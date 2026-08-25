@@ -7,7 +7,7 @@ import { useCart } from '@/lib/cart';
 import { Product } from '@/lib/types';
 
 export function AddToCart({ product }: { product: Product }) {
-  const { add, items } = useCart();
+  const { add, replaceWith, items } = useCart();
   const router = useRouter();
   const [quantity, setQuantity] = useState(1);
   const inCart = items.some((item) => item.sku === product.sku);
@@ -31,11 +31,13 @@ export function AddToCart({ product }: { product: Product }) {
           min={1}
           max={product.stock}
           value={quantity}
-          onChange={(event) =>
-            setQuantity(
-              Math.min(product.stock, Math.max(1, Number(event.target.value))),
-            )
-          }
+          onChange={(event) => {
+            const value = Number(event.target.value);
+            if (!Number.isFinite(value)) {
+              return;
+            }
+            setQuantity(Math.min(product.stock, Math.max(1, value)));
+          }}
           className="field w-20"
         />
         <button
@@ -48,7 +50,7 @@ export function AddToCart({ product }: { product: Product }) {
       <button
         className="btn btn-ghost w-full"
         onClick={() => {
-          add(product, quantity);
+          replaceWith(product, quantity);
           router.push('/checkout');
         }}
       >

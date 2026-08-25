@@ -2,13 +2,11 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import { clearAdminKey, readAdminKey, writeAdminKey } from '@/lib/admin-session';
 import { Order, Product } from '@/lib/types';
 import { OrdersBoard } from './OrdersBoard';
 import { ProductsBoard } from './ProductsBoard';
 
 export default function AdminPage() {
-  const [key, setKey] = useState('');
   const [ready, setReady] = useState(false);
   const [authed, setAuthed] = useState(false);
   const [tab, setTab] = useState<'orders' | 'products'>('orders');
@@ -17,22 +15,41 @@ export default function AdminPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
+  async function load() {
+    setError('');
+    setLoading(true);
+    try {
+      await api.adminPing();
+      const [nextOrders, nextProducts] = await Promise.all([
+        api.adminOrders(),
+        api.adminProducts(),
+      ]);
+      setOrders(nextOrders);
+      setProducts(nextProducts);
+      setAuthed(true);
+    } catch {
+      setAuthed(false);
+      setOrders([]);
+      setProducts([]);
+    } finally {
+      setLoading(false);
+      setReady(true);
+    }
+  }
+
   async function enter(nextKey: string) {
     setError('');
     setLoading(true);
     try {
-      await api.adminPing(nextKey);
+      await api.adminLogin(nextKey);
       const [nextOrders, nextProducts] = await Promise.all([
-        api.adminOrders(nextKey),
-        api.adminProducts(nextKey),
+        api.adminOrders(),
+        api.adminProducts(),
       ]);
-      writeAdminKey(nextKey);
-      setKey(nextKey);
       setOrders(nextOrders);
       setProducts(nextProducts);
       setAuthed(true);
     } catch (err) {
-      clearAdminKey();
       setAuthed(false);
       setError(err instanceof Error ? err.message : 'Нет доступа');
     } finally {
@@ -41,12 +58,7 @@ export default function AdminPage() {
   }
 
   useEffect(() => {
-    const stored = readAdminKey();
-    setKey(stored);
-    setReady(true);
-    if (stored) {
-      enter(stored);
-    }
+    load();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -56,10 +68,9 @@ export default function AdminPage() {
     enter(String(form.get('key') || '').trim());
   }
 
-  function logout() {
-    clearAdminKey();
+  async function logout() {
+    await api.adminLogout().catch(() => undefined);
     setAuthed(false);
-    setKey('');
     setOrders([]);
     setProducts([]);
   }
@@ -72,18 +83,18 @@ export default function AdminPage() {
     return (
       <form
         onSubmit={onLogin}
-        className="card mx-auto max-w-md space-y-4 p-8"
+        className="card mx-auto max-w-md space-y-4 p-5 md:p-8"
       >
         <h1 className="text-4xl font-semibold">Админка</h1>
         <p className="text-sm text-ink/60">
-          Ключ из <code>api/.env</code>, поле <code>ADMIN_KEY</code>.
+          Ключ из <code>api/.env</code>, поле <code>ADMIN_KEY</code>. Не короче 8
+          символов.
         </p>
         <input
           name="key"
           type="password"
           required
           autoFocus
-          defaultValue={key}
           placeholder="Ключ админа"
           className="field"
         />
@@ -110,7 +121,7 @@ export default function AdminPage() {
         </div>
         <div className="flex gap-2">
           <button
-            onClick={() => enter(key)}
+            onClick={() => load()}
             className="rounded-full border border-stone-200 px-4 py-2 text-sm"
           >
             Обновить
@@ -144,13 +155,9 @@ export default function AdminPage() {
       </div>
 
       {tab === 'orders' ? (
-        <OrdersBoard adminKey={key} orders={orders} setOrders={setOrders} />
+        <OrdersBoard orders={orders} setOrders={setOrders} />
       ) : (
-        <ProductsBoard
-          adminKey={key}
-          products={products}
-          setProducts={setProducts}
-        />
+        <ProductsBoard products={products} setProducts={setProducts} />
       )}
     </div>
   );

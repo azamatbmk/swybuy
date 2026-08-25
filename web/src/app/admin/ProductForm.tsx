@@ -1,6 +1,6 @@
 'use client';
 
-import { FormEvent, useState } from 'react';
+import { FormEvent, useEffect, useRef, useState } from 'react';
 import { Product } from '@/lib/types';
 import { slugify } from '@/lib/slug';
 import { ProductImage } from '@/components/ProductImage';
@@ -53,6 +53,18 @@ export function ProductForm({
   const [draft, setDraft] = useState(() => toDraft(product));
   const [slugTouched, setSlugTouched] = useState(Boolean(product));
   const [skuTouched, setSkuTouched] = useState(Boolean(product));
+  const firstField = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    firstField.current?.focus();
+    function onKey(event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        onClose();
+      }
+    }
+    window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [onClose]);
 
   function set<K extends keyof ProductDraft>(key: K, value: ProductDraft[K]) {
     setDraft((current) => ({ ...current, [key]: value }));
@@ -64,9 +76,13 @@ export function ProductForm({
   }
 
   return (
-    <div className="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto bg-ink/40 p-4">
+    <div
+      className="fixed inset-0 z-30 flex items-start justify-center overflow-y-auto bg-ink/40 p-4"
+      onClick={onClose}
+    >
       <form
         onSubmit={submit}
+        onClick={(event) => event.stopPropagation()}
         className="my-8 w-full max-w-2xl space-y-3 rounded-2xl bg-white p-6"
       >
         <div className="flex items-start justify-between gap-4">
@@ -84,6 +100,7 @@ export function ProductForm({
             required
             minLength={2}
             value={draft.name}
+            ref={firstField}
             onChange={(event) => {
               const name = event.target.value;
               set('name', name);
@@ -167,6 +184,7 @@ export function ProductForm({
           Фото
           <input
             required
+            pattern="/products/[A-Za-z0-9._-]+\.(jpg|jpeg|png|webp|svg|gif)"
             value={draft.imageUrl}
             onChange={(event) => set('imageUrl', event.target.value)}
             placeholder="/products/имя.jpg"

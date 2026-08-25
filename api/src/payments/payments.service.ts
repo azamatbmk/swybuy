@@ -2,25 +2,44 @@ import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
 import { Order } from '@prisma/client';
 
+type YookassaPayment = {
+  id?: string;
+  status?: string;
+  amount?: { value?: string; currency?: string };
+  metadata?: { orderId?: string };
+};
+
 @Injectable()
 export class PaymentsService {
   constructor(private readonly config: ConfigService) {}
+
+  paymentMode() {
+    const fallback =
+      process.env.NODE_ENV === 'production' ? 'yookassa' : 'mock';
+    return this.config.get<string>('PAYMENT_MODE', fallback);
+  }
+
+  isMockEnabled() {
+    if (process.env.NODE_ENV === 'production') {
+      return false;
+    }
+    return this.paymentMode() === 'mock';
+  }
 
   async createPaymentUrl(order: Order): Promise<string> {
     const webOrigin = this.config.get<string>(
       'WEB_ORIGIN',
       'http://localhost:3000',
     );
-    const mode = this.config.get<string>('PAYMENT_MODE', 'mock');
     const shopId = this.config.get<string>('YOOKASSA_SHOP_ID');
     const secret = this.config.get<string>('YOOKASSA_SECRET_KEY');
+    const returnUrl = `${webOrigin}/order/${order.id}`;
 
-    if (mode === 'yookassa' && shopId && secret) {
-      const auth = Buffer.from(`${shopId}:${secret}`).toString('base64');
+    if (this.paymentMode() === 'yookassa' && shopId && secret) {
       const response = await fetch('https://api.yookassa.ru/v3/payments', {
         method: 'POST',
         headers: {
-          Authorization: `Basic ${auth}`,
+          Authorization: `Basic ${this.authHeader(shopId, secret)}`,
           'Content-Type': 'application/json',
           'Idempotence-Key': order.id,
         },
@@ -32,7 +51,7 @@ export class PaymentsService {
           capture: true,
           confirmation: {
             type: 'redirect',
-            return_url: `${webOrigin}/order/${order.id}`,
+            return_url: returnUrl,
           },
           description: `Заказ SwyBuy ${order.id}`,
           metadata: { orderId: order.id },
@@ -53,6 +72,35 @@ export class PaymentsService {
       return payload.confirmation.confirmation_url;
     }
 
+    if (!this.isMockEnabled()) {
+      throw new Error('Онлайн-оплата не настроена');
+    }
+
     return `/pay/mock/${order.id}`;
+  }
+
+  async fetchYookassaPayment(paymentId: string): Promise<YookassaPayment | null> {
+    const shopId = this.config.get<string>('YOOKASSA_SHOP_ID');
+    const secret = this.config.get<string>('YOOKASSA_SECRET_KEY');
+    if (!shopId || !secret) {
+      return null;
+    }
+
+    const response = await fetch(
+      `https://api.yookassa.ru/v3/payments/${encodeURIComponent(paymentId)}`,
+      {
+        headers: {
+          Authorization: `Basic ${this.authHeader(shopId, secret)}`,
+        },
+      },
+    );
+    if (!response.ok) {
+      return null;
+    }
+    return (await response.json()) as YookassaPayment;
+  }
+
+  private authHeader(shopId: string, secret: string) {
+    return Buffer.from(`${shopId}:${secret}`).toString('base64');
   }
 }

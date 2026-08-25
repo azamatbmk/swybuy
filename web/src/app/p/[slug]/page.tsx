@@ -2,7 +2,7 @@ import { notFound } from 'next/navigation';
 import { ProductCard } from '@/components/ProductCard';
 import { ProductImage } from '@/components/ProductImage';
 import { api } from '@/lib/api';
-import { FREE_DELIVERY_FROM, relatedProducts } from '@/lib/shop';
+import { relatedProducts } from '@/lib/shop';
 import { formatPrice } from '@/lib/types';
 import { AddToCart } from './AddToCart';
 
@@ -21,8 +21,8 @@ export default async function ProductPage({
     const related = relatedProducts(product, catalog);
 
     return (
-      <div className="space-y-16">
-        <div className="grid gap-10 md:grid-cols-2 md:items-start">
+      <div className="space-y-10 md:space-y-16">
+        <div className="grid gap-6 md:grid-cols-2 md:items-start md:gap-10">
           <div className="card overflow-hidden">
             <ProductImage
               src={product.imageUrl}
@@ -32,10 +32,10 @@ export default async function ProductPage({
           </div>
           <div className="md:pt-4">
             <p className="eyebrow">На складе</p>
-            <h1 className="mt-3 text-4xl font-medium md:text-5xl">
+            <h1 className="mt-3 text-[1.85rem] font-medium leading-tight text-balance md:text-5xl">
               {product.name}
             </h1>
-            <div className="mt-4 font-display text-4xl tracking-[0.04em]">
+            <div className="mt-4 font-display text-3xl tracking-[0.04em] md:text-4xl">
               {formatPrice(product.price)}
             </div>
             <p className="mt-6 leading-relaxed text-ink/75">{product.description}</p>
@@ -58,12 +58,10 @@ export default async function ProductPage({
             ) : null}
             <p className="mt-4 text-sm text-ink/70">
               {product.stock > 0
-                ? `Отправим за 1–2 дня · ${product.stock} шт`
+                ? `По Северной Осетии — в день покупки бесплатно · ${product.stock} шт`
                 : 'Нет в наличии'}
             </p>
-            <p className="mt-2 text-sm text-ink/45">
-              СДЭК 350 ₽, бесплатно от {formatPrice(FREE_DELIVERY_FROM)}
-            </p>
+            <p className="mt-2 text-sm text-ink/45">Только по Северной Осетии</p>
             <AddToCart product={product} />
           </div>
         </div>
@@ -71,8 +69,8 @@ export default async function ProductPage({
         {related.length > 0 ? (
           <section>
             <p className="eyebrow">К этому заказу</p>
-            <h2 className="mt-3 text-4xl font-medium">Часто берут вместе</h2>
-            <div className="mt-8 grid grid-cols-2 gap-4 md:grid-cols-3 md:gap-6">
+            <h2 className="mt-3 text-[2rem] font-medium md:text-4xl">Часто берут вместе</h2>
+            <div className="mt-8 grid grid-cols-2 items-stretch gap-3 md:grid-cols-3 md:gap-6">
               {related.map((item) => (
                 <ProductCard key={item.id} product={item} />
               ))}

@@ -1,4 +1,4 @@
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Jost, Poiret_One } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/lib/cart';
@@ -22,7 +22,14 @@ const display = Poiret_One({
 export const metadata: Metadata = {
   title: 'SwyBuy — See what you buy',
   description:
-    'See what you buy. Уход со склада, отправка за 1–2 дня, бесплатная доставка от 2 500 ₽.',
+    'See what you buy. Уход со склада, по Северной Осетии доставка в день покупки бесплатно.',
+  referrer: 'strict-origin-when-cross-origin',
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  viewportFit: 'cover',
 };
 
 export default function RootLayout({
@@ -37,7 +44,9 @@ export default function RootLayout({
       >
         <CartProvider>
           <Header />
-          <main className="mx-auto max-w-6xl px-4 py-10">{children}</main>
+          <main className="mx-auto min-w-0 max-w-6xl px-4 py-6 md:py-10">
+            {children}
+          </main>
           <Footer />
         </CartProvider>
       </body>

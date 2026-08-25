@@ -2,13 +2,14 @@ import Link from 'next/link';
 
 export default function PayFailPage() {
   return (
-    <div className="card p-10 text-center md:p-14">
-      <h1 className="text-4xl font-medium">Оплата не прошла</h1>
+    <div className="card p-5 text-center md:p-14">
+      <h1 className="text-3xl font-medium md:text-4xl">Оплата не прошла</h1>
       <p className="mt-3 text-ink/60">
-        Товары остались в корзине — можно оформить заказ ещё раз.
+        Заказ уже создан. Вернитесь по ссылке после оформления и нажмите
+        «Оплатить», либо соберите корзину заново.
       </p>
-      <Link href="/cart" className="btn btn-primary mt-6">
-        В корзину
+      <Link href="/" className="btn btn-primary mt-6">
+        На витрину
       </Link>
     </div>
   );

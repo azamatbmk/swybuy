@@ -8,6 +8,8 @@ import {
   Order,
   formatDate,
   formatPrice,
+  paymentMethodLabel,
+  deliveryTypeLabel,
 } from '@/lib/types';
 
 const FILTERS = [
@@ -33,11 +35,9 @@ function contacts(order: Order) {
 }
 
 export function OrdersBoard({
-  adminKey,
   orders,
   setOrders,
 }: {
-  adminKey: string;
   orders: Order[];
   setOrders: (update: (current: Order[]) => Order[]) => void;
 }) {
@@ -46,14 +46,18 @@ export function OrdersBoard({
 
   const visible = useMemo(
     () =>
-      filter === 'all' ? orders : orders.filter((order) => order.status === filter),
+      filter === 'all'
+        ? orders
+        : filter === 'paid'
+          ? orders.filter((order) => ['paid', 'confirmed'].includes(order.status))
+          : orders.filter((order) => order.status === filter),
     [filter, orders],
   );
 
   async function patch(id: string, body: { status?: string; trackNumber?: string }) {
     setError('');
     try {
-      const updated = await api.updateOrder(adminKey, id, body);
+      const updated = await api.updateOrder(id, body);
       setOrders((current) =>
         current.map((row) => (row.id === id ? updated : row)),
       );
@@ -80,7 +84,11 @@ export function OrdersBoard({
               {item.label}
               {item.id === 'all'
                 ? ` · ${orders.length}`
-                : ` · ${orders.filter((order) => order.status === item.id).length}`}
+                : item.id === 'paid'
+                  ? ` · ${orders.filter((order) =>
+                      ['paid', 'confirmed'].includes(order.status),
+                    ).length}`
+                  : ` · ${orders.filter((order) => order.status === item.id).length}`}
             </button>
           ))}
         </div>
@@ -99,6 +107,7 @@ export function OrdersBoard({
                 </div>
                 <div className="mt-1 text-ink/50">
                   {formatDate(order.createdAt)}
+                  {` · ${paymentMethodLabel(order.paymentMethod)}`}
                   {order.ref ? ` · автор ${order.ref}` : ' · без автора'}
                   {order.authorAmount > 0
                     ? ` · ${formatPrice(order.authorAmount)} автору`
@@ -128,7 +137,7 @@ export function OrdersBoard({
                 </li>
               ))}
               <li className="flex justify-between text-ink/50">
-                <span>Доставка {order.deliveryType}</span>
+                <span>Доставка · {deliveryTypeLabel(order.deliveryType)}</span>
                 <span>{formatPrice(order.deliveryPrice)}</span>
               </li>
             </ul>
@@ -144,7 +153,7 @@ export function OrdersBoard({
 
             <input
               defaultValue={order.trackNumber || ''}
-              placeholder="Трек-номер СДЭК"
+              placeholder="Трек-номер Почты России"
               className="mt-3 w-full rounded-lg border border-stone-200 px-3 py-2"
               onBlur={(event) => {
                 const trackNumber = event.target.value.trim();

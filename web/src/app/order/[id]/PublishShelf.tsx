@@ -6,9 +6,15 @@ import { api } from '@/lib/api';
 import { readShelfToken, saveShelfToken } from '@/lib/shelf-token';
 import { Order } from '@/lib/types';
 
-const PAID = new Set(['paid', 'packed', 'shipped']);
+const PAID = new Set(['confirmed', 'paid', 'packed', 'shipped']);
 
-export function PublishShelf({ order }: { order: Order }) {
+export function PublishShelf({
+  order,
+  orderToken,
+}: {
+  order: Order;
+  orderToken: string;
+}) {
   const [name, setName] = useState(order.shelf?.name || order.customerName);
   const [selected, setSelected] = useState<string[]>(() =>
     order.shelf ? order.items.map((item) => item.sku) : [],
@@ -58,6 +64,7 @@ export function PublishShelf({ order }: { order: Order }) {
       const shelf = await api.publishShelf(order.id, {
         name,
         skus: selected,
+        orderToken,
         token: published ? readShelfToken(published.slug) || undefined : undefined,
       });
       saveShelfToken(shelf.slug, shelf.token);

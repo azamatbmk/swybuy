@@ -1,14 +1,9 @@
 import { Product } from './types';
 
-export const DELIVERY_PRICE = 350;
-export const FREE_DELIVERY_FROM = 2500;
+export const DELIVERY_PRICE = 0;
 
-export function deliveryPrice(itemsTotal: number) {
-  return itemsTotal >= FREE_DELIVERY_FROM ? 0 : DELIVERY_PRICE;
-}
-
-export function toFreeDelivery(itemsTotal: number) {
-  return Math.max(0, FREE_DELIVERY_FROM - itemsTotal);
+export function deliveryPrice(_itemsTotal: number) {
+  return 0;
 }
 
 export const ROUTINES = [

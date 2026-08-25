@@ -10,6 +10,20 @@
 html {
   text-rendering: optimizeLegibility;
   font-synthesis: none;
+  overflow-x: clip;
+}
+
+img,
+svg,
+video,
+canvas {
+  max-width: 100%;
+}
+
+input,
+select,
+textarea {
+  min-width: 0;
 }
 
 body {
@@ -17,6 +31,7 @@ body {
   font-weight: 500;
   letter-spacing: -0.01em;
   font-feature-settings: "kern" 1, "liga" 1;
+  overflow-x: clip;
   background:
     radial-gradient(1200px 500px at 10% -10%, rgba(226, 217, 247, 0.55), transparent 55%),
     radial-gradient(900px 400px at 100% 0%, rgba(255, 255, 255, 0.7), transparent 45%),
@@ -28,10 +43,20 @@ h2,
 h3 {
   font-family: var(--font-display), "Palatino Linotype", sans-serif;
   font-weight: 400;
-  letter-spacing: 0.05em;
-  line-height: 1.18;
-  -webkit-text-stroke: 0.5px currentColor;
+  letter-spacing: 0.04em;
+  line-height: 1.15;
+  overflow-wrap: break-word;
+  -webkit-text-stroke: 0.35px currentColor;
   paint-order: stroke fill;
+}
+
+@media (min-width: 768px) {
+  h1,
+  h2,
+  h3 {
+    letter-spacing: 0.05em;
+    -webkit-text-stroke: 0.5px currentColor;
+  }
 }
 
 .font-display {
@@ -53,7 +78,7 @@ h3 {
   }
 
   .field {
-    @apply w-full rounded-2xl border border-ink/10 bg-white/80 px-3 py-2.5 outline-none transition placeholder:text-ink/35 focus:border-lavender-full focus:bg-white;
+    @apply w-full min-w-0 rounded-2xl border border-ink/10 bg-white/80 px-3 py-2.5 text-base outline-none transition placeholder:text-ink/35 focus:border-lavender-full focus:bg-white;
   }
 
   .card {

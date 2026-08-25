@@ -67,7 +67,10 @@ model Order {
   street          String
   house           String
   apartment       String?
-  deliveryType    String    @default("cdek")
+  deliveryType    String    @default("pochta")
+  paymentMethod   String    @default("card")
+  accessToken     String?   @unique
+  stockReserved   Boolean   @default(false)
   deliveryPrice   Int
   itemsJson       String
   itemsTotal      Int

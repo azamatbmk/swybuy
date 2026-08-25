@@ -22,8 +22,8 @@ export function RoutineCards({
           : '/';
 
         return (
-          <Link key={routine.id} href={href} className="card group p-6">
-            <div className="font-display text-3xl tracking-[0.04em] transition group-hover:text-lavender-deep">
+          <Link key={routine.id} href={href} className="card group min-w-0 p-5 md:p-6">
+            <div className="font-display text-[1.7rem] tracking-[0.04em] transition group-hover:text-lavender-deep md:text-3xl">
               {routine.title}
             </div>
             <p className="mt-3 text-sm leading-relaxed text-ink/55">{routine.text}</p>
