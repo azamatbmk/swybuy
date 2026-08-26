@@ -1,6 +1,7 @@
 import Link from 'next/link';
-import { Product, formatPrice } from '@/lib/types';
+import { Product } from '@/lib/types';
 import { ProductImage } from './ProductImage';
+import { PriceTag } from './PriceTag';
 import { QuickAdd } from './QuickAdd';
 
 export function ProductCard({
@@ -28,9 +29,7 @@ export function ProductCard({
       </Link>
       <div className="mt-auto flex flex-col gap-2 p-3 pt-2 md:flex-row md:items-end md:justify-between md:gap-3 md:p-4 md:pt-2">
         <div>
-          <div className="font-display text-xl tracking-[0.04em] md:text-2xl">
-            {formatPrice(product.price)}
-          </div>
+          <PriceTag product={product} size="sm" />
           <div className="mt-1 text-xs text-ink/45">
             {product.stock > 0 ? 'На складе' : 'Нет в наличии'}
           </div>

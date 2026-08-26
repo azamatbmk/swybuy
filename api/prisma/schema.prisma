@@ -13,6 +13,7 @@ model Product {
   slug        String   @unique
   name        String
   price       Int
+  discountPercent Int?
   stock       Int
   weightGrams Int      @default(200)
   description String
@@ -94,4 +95,10 @@ model Order {
   createdAt       DateTime  @default(now())
   updatedAt       DateTime  @updatedAt
   paidAt          DateTime?
+}
+
+model ShopSettings {
+  id                     String  @id
+  globalDiscountOn       Boolean @default(false)
+  globalDiscountPercent  Int     @default(0)
 }

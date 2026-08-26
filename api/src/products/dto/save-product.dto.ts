@@ -1,16 +1,26 @@
-import { Type } from 'class-transformer';
+import { Transform, Type } from 'class-transformer';
 import {
   IsBoolean,
   IsInt,
   IsOptional,
   IsString,
   Matches,
+  Max,
   MaxLength,
   Min,
   MinLength,
+  ValidateIf,
 } from 'class-validator';
 
 const IMAGE_PATH = /^\/products\/[A-Za-z0-9._-]+\.(jpg|jpeg|png|webp|svg|gif)$/i;
+
+function emptyToNull({ value }: { value: unknown }) {
+  if (value === '' || value === undefined || value === null) {
+    return null;
+  }
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
 
 export class CreateProductDto {
   @IsString()
@@ -32,6 +42,14 @@ export class CreateProductDto {
   @IsInt()
   @Min(0)
   price: number;
+
+  @IsOptional()
+  @Transform(emptyToNull)
+  @ValidateIf((_, value) => value !== null)
+  @IsInt()
+  @Min(0)
+  @Max(90)
+  discountPercent?: number | null;
 
   @Type(() => Number)
   @IsInt()
@@ -71,7 +89,6 @@ export class CreateProductDto {
   imageUrl: string;
 
   @IsOptional()
-  @Type(() => Boolean)
   @IsBoolean()
   active?: boolean;
 }
@@ -100,6 +117,14 @@ export class UpdateProductDto {
   @IsInt()
   @Min(0)
   price?: number;
+
+  @IsOptional()
+  @Transform(emptyToNull)
+  @ValidateIf((_, value) => value !== null && value !== undefined)
+  @IsInt()
+  @Min(0)
+  @Max(90)
+  discountPercent?: number | null;
 
   @IsOptional()
   @Type(() => Number)
@@ -141,7 +166,6 @@ export class UpdateProductDto {
   imageUrl?: string;
 
   @IsOptional()
-  @Type(() => Boolean)
   @IsBoolean()
   active?: boolean;
 }

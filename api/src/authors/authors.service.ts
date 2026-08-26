@@ -7,10 +7,14 @@ import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { parseSocialHandle } from '../lib/social-handle';
 import { SaveAuthorDto } from './dto/save-author.dto';
+import { ProductsService } from '../products/products.service';
 
 @Injectable()
 export class AuthorsService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly productsService: ProductsService,
+  ) {}
 
   findAll() {
     return this.prisma.author.findMany({
@@ -34,7 +38,7 @@ export class AuthorsService {
       slug: author.slug,
       name: author.name,
       handle: author.handle || author.slug,
-      products,
+      products: await this.productsService.presentMany(products),
     };
   }
 

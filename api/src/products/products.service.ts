@@ -2,16 +2,57 @@ import { BadRequestException, Injectable, NotFoundException } from '@nestjs/comm
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateProductDto, UpdateProductDto } from './dto/save-product.dto';
+import { ShopSettingsDto } from '../admin/dto/shop-settings.dto';
+import { withSale } from '../lib/sale';
 
 @Injectable()
 export class ProductsService {
   constructor(private readonly prisma: PrismaService) {}
 
-  findPublic() {
-    return this.prisma.product.findMany({
+  async getSettings() {
+    return this.prisma.shopSettings.upsert({
+      where: { id: 'shop' },
+      create: {
+        id: 'shop',
+        globalDiscountOn: false,
+        globalDiscountPercent: 0,
+      },
+      update: {},
+    });
+  }
+
+  async updateSettings(dto: ShopSettingsDto) {
+    return this.prisma.shopSettings.upsert({
+      where: { id: 'shop' },
+      create: {
+        id: 'shop',
+        globalDiscountOn: dto.globalDiscountOn,
+        globalDiscountPercent: dto.globalDiscountPercent,
+      },
+      update: {
+        globalDiscountOn: dto.globalDiscountOn,
+        globalDiscountPercent: dto.globalDiscountPercent,
+      },
+    });
+  }
+
+  async present(product: { price: number; discountPercent?: number | null }) {
+    return withSale(product, await this.getSettings());
+  }
+
+  async presentMany<T extends { price: number; discountPercent?: number | null }>(
+    products: T[],
+  ) {
+    const settings = await this.getSettings();
+    return products.map((product) => withSale(product, settings));
+  }
+
+  async findPublic() {
+    const products = await this.prisma.product.findMany({
       where: { active: true },
       orderBy: { name: 'asc' },
     });
+    return this.presentMany(products);
   }
 
   async findBySlug(slug: string) {
@@ -19,21 +60,25 @@ export class ProductsService {
     if (!product || !product.active) {
       throw new NotFoundException('Товар не найден');
     }
-    return product;
+    return this.present(product);
   }
 
-  findAllAdmin() {
-    return this.prisma.product.findMany({ orderBy: { name: 'asc' } });
+  async findAllAdmin() {
+    const products = await this.prisma.product.findMany({
+      orderBy: { name: 'asc' },
+    });
+    return this.presentMany(products);
   }
 
   async createAdmin(dto: CreateProductDto) {
     try {
-      return await this.prisma.product.create({
+      const product = await this.prisma.product.create({
         data: {
           name: dto.name.trim(),
           sku: dto.sku.trim().toLowerCase(),
           slug: dto.slug.trim().toLowerCase(),
           price: dto.price,
+          discountPercent: dto.discountPercent ?? null,
           stock: dto.stock,
           weightGrams: dto.weightGrams ?? 200,
           description: dto.description.trim(),
@@ -44,6 +89,7 @@ export class ProductsService {
           active: dto.active ?? true,
         },
       });
+      return this.present(product);
     } catch (error) {
       this.throwIfDuplicate(error);
       throw error;
@@ -52,7 +98,7 @@ export class ProductsService {
 
   async updateAdmin(id: string, data: UpdateProductDto) {
     try {
-      return await this.prisma.product.update({
+      const product = await this.prisma.product.update({
         where: { id },
         data: {
           ...(data.name !== undefined ? { name: data.name.trim() } : {}),
@@ -61,6 +107,9 @@ export class ProductsService {
             ? { slug: data.slug.trim().toLowerCase() }
             : {}),
           ...(data.price !== undefined ? { price: data.price } : {}),
+          ...(data.discountPercent !== undefined
+            ? { discountPercent: data.discountPercent }
+            : {}),
           ...(data.stock !== undefined ? { stock: data.stock } : {}),
           ...(data.weightGrams !== undefined
             ? { weightGrams: data.weightGrams }
@@ -77,6 +126,7 @@ export class ProductsService {
           ...(data.active !== undefined ? { active: data.active } : {}),
         },
       });
+      return this.present(product);
     } catch (error) {
       this.throwIfDuplicate(error);
       throw error;

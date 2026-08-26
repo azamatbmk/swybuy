@@ -8,7 +8,7 @@ import {
   useMemo,
   useState,
 } from 'react';
-import { CartItem, Product } from './types';
+import { CartItem, Product, sellingPrice } from './types';
 
 const STORAGE_KEY = 'swybuy_cart';
 
@@ -28,11 +28,14 @@ type CartContextValue = {
 const CartContext = createContext<CartContextValue | null>(null);
 
 function toCartItem(product: Product, quantity: number): CartItem {
+  const pay = sellingPrice(product);
+  const list = product.price;
   return {
     sku: product.sku,
     slug: product.slug,
     name: product.name,
-    price: product.price,
+    price: pay,
+    listPrice: list > pay ? list : undefined,
     imageUrl: product.imageUrl,
     quantity: Math.min(Math.max(quantity, 1), product.stock),
     stock: product.stock,
@@ -83,7 +86,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
           item.sku === product.sku
             ? {
                 ...item,
-                price: product.price,
+                price: sellingPrice(product),
+                listPrice:
+                  product.price > sellingPrice(product)
+                    ? product.price
+                    : undefined,
                 stock: product.stock,
                 name: product.name,
                 imageUrl: product.imageUrl,
@@ -141,7 +148,11 @@ export function CartProvider({ children }: { children: React.ReactNode }) {
             ...item,
             slug: product.slug,
             name: product.name,
-            price: product.price,
+            price: sellingPrice(product),
+            listPrice:
+              product.price > sellingPrice(product)
+                ? product.price
+                : undefined,
             imageUrl: product.imageUrl,
             stock: product.stock,
             quantity: Math.min(item.quantity, product.stock),

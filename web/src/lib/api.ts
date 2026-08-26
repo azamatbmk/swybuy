@@ -1,4 +1,4 @@
-import { Author, Order, Product, Shelf, ShelfPublish } from './types';
+import { Author, Order, Product, ShopSettings, Shelf, ShelfPublish } from './types';
 
 function apiBase() {
   if (typeof window === 'undefined') {
@@ -104,6 +104,12 @@ export const api = {
   adminPing: () => request<{ ok: boolean }>('/admin/ping'),
   adminOrders: () => request<Order[]>('/admin/orders'),
   adminProducts: () => request<Product[]>('/admin/products'),
+  adminSettings: () => request<ShopSettings>('/admin/settings'),
+  updateSettings: (body: ShopSettings) =>
+    request<ShopSettings>('/admin/settings', {
+      method: 'PATCH',
+      body: JSON.stringify(body),
+    }),
   adminAuthors: () => request<Author[]>('/admin/authors'),
   createAuthor: (body: { handle: string; skus: string[] }) =>
     request<Author>('/admin/authors', {

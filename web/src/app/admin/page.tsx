@@ -2,7 +2,7 @@
 
 import { FormEvent, useEffect, useState } from 'react';
 import { api } from '@/lib/api';
-import { Author, Order, Product, formatPrice } from '@/lib/types';
+import { Author, Order, Product, ShopSettings, formatPrice } from '@/lib/types';
 import { AuthorsBoard } from './AuthorsBoard';
 import { OrdersBoard } from './OrdersBoard';
 import { ProductsBoard } from './ProductsBoard';
@@ -13,6 +13,10 @@ export default function AdminPage() {
   const [tab, setTab] = useState<'orders' | 'products' | 'authors'>('orders');
   const [orders, setOrders] = useState<Order[]>([]);
   const [products, setProducts] = useState<Product[]>([]);
+  const [settings, setSettings] = useState<ShopSettings>({
+    globalDiscountOn: false,
+    globalDiscountPercent: 0,
+  });
   const [authors, setAuthors] = useState<Author[]>([]);
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -22,20 +26,24 @@ export default function AdminPage() {
     setLoading(true);
     try {
       await api.adminPing();
-      const [nextOrders, nextProducts, nextAuthors] = await Promise.all([
-        api.adminOrders(),
-        api.adminProducts(),
-        api.adminAuthors(),
-      ]);
+      const [nextOrders, nextProducts, nextAuthors, nextSettings] =
+        await Promise.all([
+          api.adminOrders(),
+          api.adminProducts(),
+          api.adminAuthors(),
+          api.adminSettings(),
+        ]);
       setOrders(nextOrders);
       setProducts(nextProducts);
       setAuthors(nextAuthors);
+      setSettings(nextSettings);
       setAuthed(true);
     } catch {
       setAuthed(false);
       setOrders([]);
       setProducts([]);
       setAuthors([]);
+      setSettings({ globalDiscountOn: false, globalDiscountPercent: 0 });
     } finally {
       setLoading(false);
       setReady(true);
@@ -47,14 +55,17 @@ export default function AdminPage() {
     setLoading(true);
     try {
       await api.adminLogin(nextKey);
-      const [nextOrders, nextProducts, nextAuthors] = await Promise.all([
-        api.adminOrders(),
-        api.adminProducts(),
-        api.adminAuthors(),
-      ]);
+      const [nextOrders, nextProducts, nextAuthors, nextSettings] =
+        await Promise.all([
+          api.adminOrders(),
+          api.adminProducts(),
+          api.adminAuthors(),
+          api.adminSettings(),
+        ]);
       setOrders(nextOrders);
       setProducts(nextProducts);
       setAuthors(nextAuthors);
+      setSettings(nextSettings);
       setAuthed(true);
     } catch (err) {
       setAuthed(false);
@@ -80,6 +91,7 @@ export default function AdminPage() {
     setOrders([]);
     setProducts([]);
     setAuthors([]);
+    setSettings({ globalDiscountOn: false, globalDiscountPercent: 0 });
   }
 
   if (!ready) {
@@ -122,7 +134,7 @@ export default function AdminPage() {
             {products.filter((item) => item.active).length} в витрине · склад{' '}
             {formatPrice(
               products.reduce(
-                (sum, item) => sum + item.price * item.stock,
+                (sum, item) => sum + (item.salePrice ?? item.price) * item.stock,
                 0,
               ),
             )}
@@ -174,7 +186,12 @@ export default function AdminPage() {
       {tab === 'orders' ? (
         <OrdersBoard orders={orders} setOrders={setOrders} />
       ) : tab === 'products' ? (
-        <ProductsBoard products={products} setProducts={setProducts} />
+        <ProductsBoard
+          products={products}
+          settings={settings}
+          setProducts={setProducts}
+          setSettings={setSettings}
+        />
       ) : (
         <AuthorsBoard
           authors={authors}

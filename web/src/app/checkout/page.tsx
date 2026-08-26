@@ -79,6 +79,13 @@ export default function CheckoutPage() {
     }
   }
 
+  const shipping = deliveryPrice(total);
+  const listTotal = items.reduce(
+    (sum, item) => sum + (item.listPrice ?? item.price) * item.quantity,
+    0,
+  );
+  const saved = listTotal - total;
+
   return (
     <div className="grid items-start gap-8 md:grid-cols-2">
       <form onSubmit={onSubmit} className="card space-y-3 p-5 md:p-8">
@@ -198,23 +205,38 @@ export default function CheckoutPage() {
               <span className="min-w-0">
                 {item.name} × {item.quantity}
               </span>
-              <span className="shrink-0 tabular-nums">
-                {formatPrice(item.price * item.quantity)}
+              <span className="shrink-0 text-right tabular-nums">
+                {item.listPrice != null && item.listPrice > item.price ? (
+                  <>
+                    <span className="mb-0.5 block text-ink/40 line-through sm:mb-0 sm:mr-2 sm:inline">
+                      {formatPrice(item.listPrice * item.quantity)}
+                    </span>
+                    {formatPrice(item.price * item.quantity)}
+                  </>
+                ) : (
+                  formatPrice(item.price * item.quantity)
+                )}
               </span>
             </div>
           ))}
           <div className="flex justify-between gap-3 text-ink/60">
             <span className="min-w-0">Доставка по Северной Осетии</span>
             <span className="shrink-0">
-              {deliveryPrice(total) === 0
-                ? 'бесплатно'
-                : formatPrice(deliveryPrice(total))}
+              {shipping === 0 ? 'бесплатно' : formatPrice(shipping)}
             </span>
           </div>
+          {saved > 0 ? (
+            <div className="flex justify-between gap-3 text-lavender-deep">
+              <span>Скидка</span>
+              <span className="shrink-0 tabular-nums">
+                −{formatPrice(saved)}
+              </span>
+            </div>
+          ) : null}
           <div className="flex justify-between gap-3 border-t border-stone-100 pt-3 text-lg font-semibold">
             <span className="min-w-0">При получении</span>
             <span className="shrink-0 tabular-nums">
-              {formatPrice(total + deliveryPrice(total))}
+              {formatPrice(total + shipping)}
             </span>
           </div>
         </div>

@@ -1,9 +1,17 @@
+export type ShopSettings = {
+  globalDiscountOn: boolean;
+  globalDiscountPercent: number;
+};
+
 export type Product = {
   id: string;
   sku: string;
   slug: string;
   name: string;
   price: number;
+  salePrice?: number;
+  discountPercent?: number;
+  ownDiscountPercent?: number | null;
   stock: number;
   weightGrams: number;
   description: string;
@@ -19,6 +27,7 @@ export type CartItem = {
   slug: string;
   name: string;
   price: number;
+  listPrice?: number;
   imageUrl: string;
   quantity: number;
   stock: number;
@@ -109,6 +118,10 @@ export function paymentMethodLabel(method?: string) {
 export function deliveryTypeLabel(type?: string) {
   void type;
   return 'Почта России';
+}
+
+export function sellingPrice(product: { price: number; salePrice?: number }) {
+  return product.salePrice ?? product.price;
 }
 
 export function formatPrice(value: number) {

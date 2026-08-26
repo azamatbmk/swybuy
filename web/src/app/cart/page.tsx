@@ -25,6 +25,11 @@ export default function CartPage() {
   }, [syncFromCatalog]);
 
   const shipping = deliveryPrice(total);
+  const listTotal = items.reduce(
+    (sum, item) => sum + (item.listPrice ?? item.price) * item.quantity,
+    0,
+  );
+  const saved = listTotal - total;
   const upsells = cartUpsells(
     items.map((item) => item.sku),
     catalog,
@@ -76,7 +81,18 @@ export default function CartPage() {
               <Link href={`/p/${item.slug}`} className="line-clamp-2 font-medium">
                 {item.name}
               </Link>
-              <div className="text-sm text-ink/50">{formatPrice(item.price)}</div>
+              <div className="text-sm">
+                {item.listPrice != null && item.listPrice > item.price ? (
+                  <>
+                    <span className="text-ink/40 line-through">
+                      {formatPrice(item.listPrice)}
+                    </span>{' '}
+                    <span className="text-ink">{formatPrice(item.price)}</span>
+                  </>
+                ) : (
+                  <span className="text-ink/50">{formatPrice(item.price)}</span>
+                )}
+              </div>
               <div className="mt-2 flex items-center gap-3">
                 <input
                   type="number"
@@ -128,6 +144,11 @@ export default function CartPage() {
             Товары {formatPrice(total)} · доставка{' '}
             {shipping === 0 ? 'бесплатно' : formatPrice(shipping)}
           </div>
+          {saved > 0 ? (
+            <div className="mt-1 text-sm text-lavender-deep">
+              Скидка {formatPrice(saved)}
+            </div>
+          ) : null}
         </div>
         <Link href="/checkout" className="btn btn-primary min-h-12 w-full sm:w-auto">
           Оформить

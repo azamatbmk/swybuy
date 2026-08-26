@@ -6,10 +6,11 @@ import {
 import { randomBytes } from 'crypto';
 import { Prisma } from '@prisma/client';
 import { PrismaService } from '../prisma/prisma.service';
-import { CreateOrderDto } from './dto/create-order.dto';
+import { ProductsService } from '../products/products.service';
 import { AUTHOR_PERCENT, deliveryPrice } from './pricing';
 import { isOssetiaCity } from '../lib/ossetia';
 import { safeEqual } from '../lib/safe-equal';
+import { CreateOrderDto } from './dto/create-order.dto';
 
 export type OrderItemSnapshot = {
   sku: string;
@@ -37,7 +38,10 @@ const PENDING_TTL_MS = 45 * 60 * 1000;
 
 @Injectable()
 export class OrdersService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly productsService: ProductsService,
+  ) {}
 
   async create(dto: CreateOrderDto) {
     await this.expireStalePending();
@@ -63,9 +67,10 @@ export class OrdersService {
       throw new BadRequestException('Один из товаров недоступен');
     }
 
+    const priced = await this.productsService.presentMany(products);
     const items: OrderItemSnapshot[] = [...merged.entries()].map(
       ([sku, quantity]) => {
-        const product = products.find((row) => row.sku === sku);
+        const product = priced.find((row) => row.sku === sku);
         if (!product) {
           throw new BadRequestException(`Нет товара ${sku}`);
         }
@@ -79,7 +84,7 @@ export class OrdersService {
           sku: product.sku,
           slug: product.slug,
           name: product.name,
-          price: product.price,
+          price: product.salePrice,
           quantity,
         };
       },

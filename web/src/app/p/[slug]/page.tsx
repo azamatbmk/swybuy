@@ -3,7 +3,7 @@ import { ProductCard } from '@/components/ProductCard';
 import { ProductImage } from '@/components/ProductImage';
 import { api } from '@/lib/api';
 import { relatedProducts } from '@/lib/shop';
-import { formatPrice } from '@/lib/types';
+import { PriceTag } from '@/components/PriceTag';
 import { AddToCart } from './AddToCart';
 
 export default async function ProductPage({
@@ -31,12 +31,14 @@ export default async function ProductPage({
             />
           </div>
           <div className="md:pt-4">
-            <p className="eyebrow">На складе</p>
+            <p className="eyebrow">
+              {product.stock > 0 ? 'На складе' : 'Нет в наличии'}
+            </p>
             <h1 className="mt-3 text-[1.85rem] font-medium leading-tight text-balance md:text-5xl">
               {product.name}
             </h1>
-            <div className="mt-4 font-display text-3xl tracking-[0.04em] md:text-4xl">
-              {formatPrice(product.price)}
+            <div className="mt-4">
+              <PriceTag product={product} size="lg" />
             </div>
             <p className="mt-6 leading-relaxed text-ink/75">{product.description}</p>
             {product.warning ? (

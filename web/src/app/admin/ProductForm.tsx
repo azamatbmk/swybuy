@@ -1,15 +1,17 @@
 'use client';
 
 import { FormEvent, useEffect, useRef, useState } from 'react';
-import { Product } from '@/lib/types';
+import { Product, ShopSettings, formatPrice } from '@/lib/types';
 import { slugify } from '@/lib/slug';
 import { ProductImage } from '@/components/ProductImage';
+import { effectiveDiscount, salePrice } from '@/lib/sale';
 
 export type ProductDraft = {
   name: string;
   sku: string;
   slug: string;
   price: number;
+  discountInput: string;
   stock: number;
   weightGrams: number;
   description: string;
@@ -26,6 +28,11 @@ function toDraft(product?: Product): ProductDraft {
     sku: product?.sku || '',
     slug: product?.slug || '',
     price: product?.price ?? 0,
+    discountInput:
+      product?.ownDiscountPercent === null ||
+      product?.ownDiscountPercent === undefined
+        ? ''
+        : String(product.ownDiscountPercent),
     stock: product?.stock ?? 0,
     weightGrams: product?.weightGrams ?? 200,
     description: product?.description || '',
@@ -39,12 +46,14 @@ function toDraft(product?: Product): ProductDraft {
 
 export function ProductForm({
   product,
+  settings,
   saving,
   error,
   onClose,
   onSubmit,
 }: {
   product?: Product;
+  settings: ShopSettings;
   saving: boolean;
   error: string;
   onClose: () => void;
@@ -156,7 +165,41 @@ export function ProductForm({
               onChange={(event) => set('price', Number(event.target.value))}
               className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2"
             />
+            <span className="mt-1 block text-xs text-ink/40">Обычная цена</span>
           </label>
+          <label className="text-sm">
+            Скидка, %
+            <input
+              type="number"
+              min={0}
+              max={90}
+              value={draft.discountInput}
+              onChange={(event) => set('discountInput', event.target.value)}
+              placeholder="как у всех"
+              className="mt-1 w-full rounded-xl border border-stone-200 px-3 py-2"
+            />
+            <span className="mt-1 block text-xs text-ink/40">
+              Пусто — общая скидка. 0 — без скидки.
+            </span>
+          </label>
+          <div className="text-sm">
+            Новая цена
+            <div className="mt-1 rounded-xl border border-stone-200 px-3 py-2">
+              {formatPrice(
+                salePrice(
+                  Number.isFinite(draft.price) ? draft.price : 0,
+                  effectiveDiscount(
+                    draft.discountInput.trim() === ''
+                      ? null
+                      : Number.isFinite(Number(draft.discountInput))
+                        ? Number(draft.discountInput)
+                        : undefined,
+                    settings,
+                  ),
+                ),
+              )}
+            </div>
+          </div>
           <label className="text-sm">
             Остаток
             <input

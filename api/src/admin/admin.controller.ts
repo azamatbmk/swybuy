@@ -23,6 +23,7 @@ import { UpdateOrderDto } from './dto/update-order.dto';
 import { AdminLoginDto } from './dto/admin-login.dto';
 import { AuthorsService } from '../authors/authors.service';
 import { SaveAuthorDto } from '../authors/dto/save-author.dto';
+import { ShopSettingsDto } from './dto/shop-settings.dto';
 import { clientIp, rateLimit } from '../lib/rate-limit';
 
 function isSecureRequest(request: {
@@ -119,6 +120,18 @@ export class AdminController {
   @UseGuards(AdminGuard)
   products() {
     return this.productsService.findAllAdmin();
+  }
+
+  @Get('settings')
+  @UseGuards(AdminGuard)
+  settings() {
+    return this.productsService.getSettings();
+  }
+
+  @Patch('settings')
+  @UseGuards(AdminGuard)
+  updateSettings(@Body() body: ShopSettingsDto) {
+    return this.productsService.updateSettings(body);
   }
 
   @Post('products')

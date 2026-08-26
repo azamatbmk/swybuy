@@ -10,12 +10,16 @@ import { slugify } from '../lib/slugify';
 import { safeEqual } from '../lib/safe-equal';
 import { OrderItemSnapshot } from '../orders/orders.service';
 import { PublishShelfDto, UpdateShelfDto } from './dto/publish-shelf.dto';
+import { ProductsService } from '../products/products.service';
 
 const PAID = new Set(['confirmed', 'paid', 'packed', 'shipped']);
 
 @Injectable()
 export class ShelvesService {
-  constructor(private readonly prisma: PrismaService) {}
+  constructor(
+    private readonly prisma: PrismaService,
+    private readonly productsService: ProductsService,
+  ) {}
 
   async findPublic(slug: string) {
     const user = await this.prisma.user.findUnique({
@@ -34,7 +38,8 @@ export class ShelvesService {
           where: { sku: { in: skus }, active: true },
         })
       : [];
-    const bySku = new Map(products.map((product) => [product.sku, product]));
+    const priced = await this.productsService.presentMany(products);
+    const bySku = new Map(priced.map((product) => [product.sku, product]));
 
     return {
       name: user.name,
