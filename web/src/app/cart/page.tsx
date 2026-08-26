@@ -63,7 +63,7 @@ export default function CartPage() {
         <p className="eyebrow">Заказ</p>
         <h1 className="mt-2 text-4xl font-medium md:text-5xl">Корзина</h1>
       </div>
-      <DeliveryHint total={total} />
+      <DeliveryHint />
       <div className="space-y-3">
         {items.map((item) => (
           <div key={item.sku} className="card flex gap-3 p-3 md:items-center md:gap-4 md:p-4">

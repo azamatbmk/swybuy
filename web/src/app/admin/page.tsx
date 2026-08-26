@@ -66,7 +66,6 @@ export default function AdminPage() {
 
   useEffect(() => {
     load();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function onLogin(event: FormEvent<HTMLFormElement>) {

@@ -106,7 +106,8 @@ export function paymentMethodLabel(method?: string) {
   return method === 'cash' ? 'Наличными при получении' : 'Картой онлайн';
 }
 
-export function deliveryTypeLabel(_type?: string) {
+export function deliveryTypeLabel(type?: string) {
+  void type;
   return 'Почта России';
 }
 

@@ -2,7 +2,7 @@
 
 Сайт и API живут на **одном** облачном сервере. Домен указывает на этот сервер. API снаружи не открываем: браузер ходит на `https://домен/backend/…`.
 
-Замените `your-domain.ru` на ваш домен везде, где он встречается.
+Домен: **swybuy.ru**.
 
 ## 1. Сервер в Timeweb Cloud
 
@@ -37,7 +37,7 @@ IP сервера — тот, что скопировали. TTL можно 300�
 Проверка с компьютера (PowerShell):
 
 ```powershell
-nslookup your-domain.ru
+nslookup swybuy.ru
 ```
 
 Должен показаться IP сервера. Иногда 10–30 минут.
@@ -88,7 +88,7 @@ nano /var/www/swybuy/api/.env
 
 В `.env` обязательно:
 
-- `WEB_ORIGIN="https://your-domain.ru"` — без `www`, если редирект будет на голый домен (или наоборот, но **один** канонический адрес).
+- `WEB_ORIGIN="https://swybuy.ru"` — канонический адрес без www.
 - `ADMIN_KEY` — длинная случайная строка, не как на компьютере. Например:
 
 ```bash
@@ -141,11 +141,10 @@ pm2 status
 
 ## 7. Nginx
 
-Скопируйте конфиг и замените домен (оба вхождения `your-domain.ru`, включая `www`):
+Скопируйте конфиг (домен уже `swybuy.ru`):
 
 ```bash
 cp /var/www/swybuy/deploy/nginx.conf /etc/nginx/sites-available/swybuy
-nano /etc/nginx/sites-available/swybuy
 ln -sf /etc/nginx/sites-available/swybuy /etc/nginx/sites-enabled/swybuy
 rm -f /etc/nginx/sites-enabled/default
 nginx -t && systemctl reload nginx
@@ -154,17 +153,17 @@ nginx -t && systemctl reload nginx
 Пока DNS дошёл, сайт может открываться по `http://IP`. Когда `nslookup` показывает IP сервера:
 
 ```bash
-certbot --nginx -d your-domain.ru -d www.your-domain.ru
+certbot --nginx -d swybuy.ru -d www.swybuy.ru
 ```
 
 Согласитесь на редирект HTTP → HTTPS.
 
 ## 8. Проверка в браузере
 
-- `https://your-domain.ru` — витрина
+- `https://swybuy.ru` — витрина
 - заказ: имя + телефон
-- `https://your-domain.ru/admin` — ключ из `api/.env`
-- `https://your-domain.ru/a/masha` — витрина блогера, если сид уже был
+- `https://swybuy.ru/admin` — ключ из `api/.env`
+- `https://swybuy.ru/a/masha` — витрина блогера, если сид уже был
 
 Если админка не пускает: `WEB_ORIGIN` должен быть именно `https://…` (тот адрес, что в строке браузера), и `TRUST_PROXY=1`.
 

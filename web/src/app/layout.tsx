@@ -19,6 +19,8 @@ const display = Poiret_One({
   display: 'swap',
 });
 
+export const dynamic = 'force-dynamic';
+
 export const metadata: Metadata = {
   title: 'SwyBuy — See what you buy',
   description:

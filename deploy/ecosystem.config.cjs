@@ -3,8 +3,9 @@ module.exports = {
     {
       name: 'swybuy-api',
       cwd: '/var/www/swybuy/api',
-      script: 'dist/main.js',
+      script: 'dist/src/main.js',
       instances: 1,
+      exec_mode: 'fork',
       autorestart: true,
       env: {
         NODE_ENV: 'production',
@@ -16,6 +17,7 @@ module.exports = {
       script: './node_modules/next/dist/bin/next',
       args: 'start -p 3000',
       instances: 1,
+      exec_mode: 'fork',
       autorestart: true,
       env: {
         NODE_ENV: 'production',

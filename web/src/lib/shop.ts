@@ -2,7 +2,8 @@ import { Product } from './types';
 
 export const DELIVERY_PRICE = 0;
 
-export function deliveryPrice(_itemsTotal: number) {
+export function deliveryPrice(itemsTotal: number) {
+  void itemsTotal;
   return 0;
 }
 
