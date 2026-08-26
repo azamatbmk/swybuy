@@ -1,7 +1,6 @@
 import { Suspense } from 'react';
 import { Catalog } from '@/components/Catalog';
 import { RoutineCards } from '@/components/RoutineCards';
-import { TrustBar } from '@/components/TrustBar';
 import { api } from '@/lib/api';
 
 export default async function HomePage() {
@@ -62,8 +61,6 @@ export default async function HomePage() {
           </div>
         ) : null}
       </section>
-
-      <TrustBar />
 
       <section id="catalog">
         <p className="eyebrow">На складе</p>

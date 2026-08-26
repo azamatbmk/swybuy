@@ -2,7 +2,6 @@ import { Suspense } from 'react';
 import { notFound } from 'next/navigation';
 import { Catalog } from '@/components/Catalog';
 import { RoutineCards } from '@/components/RoutineCards';
-import { TrustBar } from '@/components/TrustBar';
 import { api } from '@/lib/api';
 import { ROUTINES, productsBySkus } from '@/lib/shop';
 
@@ -34,8 +33,6 @@ export default async function AuthorPage({
             доставка в день покупки бесплатно.
           </p>
         </section>
-
-        <TrustBar />
 
         {ROUTINES.some((routine) => productsBySkus(products, routine.skus).length > 0) ? (
           <section>
