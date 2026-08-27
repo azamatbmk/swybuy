@@ -9,13 +9,14 @@ module.exports = {
       autorestart: true,
       env: {
         NODE_ENV: 'production',
+        HOST: '127.0.0.1',
       },
     },
     {
       name: 'swybuy-web',
       cwd: '/var/www/swybuy/web',
       script: './node_modules/next/dist/bin/next',
-      args: 'start -p 3000',
+      args: 'start -H 127.0.0.1 -p 3000',
       instances: 1,
       exec_mode: 'fork',
       autorestart: true,
