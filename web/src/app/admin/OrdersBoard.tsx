@@ -17,7 +17,19 @@ const FILTERS = [
   { id: 'new', label: 'Собрать' },
   { id: 'packed', label: 'Отправить' },
   { id: 'shipped', label: 'В пути' },
+  { id: 'failed', label: 'Ошибки' },
+  { id: 'returned', label: 'Возврат' },
 ] as const;
+
+function tabFor(status: string): (typeof FILTERS)[number]['id'] {
+  if (['confirmed', 'paid'].includes(status)) {
+    return 'new';
+  }
+  if (status === 'packed' || status === 'shipped' || status === 'failed' || status === 'returned') {
+    return status;
+  }
+  return 'all';
+}
 
 function address(order: Order) {
   return [
@@ -86,6 +98,9 @@ export function OrdersBoard({
       setOrders((current) =>
         current.map((row) => (row.id === id ? updated : row)),
       );
+      if (body.status) {
+        setFilter(tabFor(updated.status));
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Не удалось сохранить заказ');
     }
