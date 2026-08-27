@@ -1,9 +1,11 @@
 import type { Metadata, Viewport } from 'next';
+import { Suspense } from 'react';
 import { Jost, Poiret_One } from 'next/font/google';
 import './globals.css';
 import { CartProvider } from '@/lib/cart';
 import { Footer } from '@/components/Footer';
 import { Header } from '@/components/Header';
+import { YandexMetrika } from '@/components/YandexMetrika';
 
 const sans = Jost({
   subsets: ['latin', 'cyrillic'],
@@ -51,6 +53,9 @@ export default function RootLayout({
       <body
         className={`${sans.variable} ${display.variable} font-sans min-h-screen bg-cream text-ink antialiased`}
       >
+        <Suspense>
+          <YandexMetrika />
+        </Suspense>
         <CartProvider>
           <Header />
           <main className="mx-auto min-w-0 max-w-6xl px-4 py-6 md:py-10">
